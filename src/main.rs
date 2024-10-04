@@ -5,8 +5,8 @@ const PC: usize = 1; //Program Counter
 const IR: usize = 2; //Instruction Register
 const MAR: usize = 3; //Memory Address Register
 const MBR: usize = 4; //Memory Buffer Register
-const INPUT: usize = 5;
-const OUTPUT: usize = 6;
+// const INPUT: usize = 5; input register - implemented via std::io
+// const OUTPUT: usize = 6; output register - implemented via std::io
 
 struct CPU {
     registers: [i16; 7],
@@ -164,7 +164,8 @@ impl CPU {
     }
 
     fn output(&self) {
-        println!("Output: {}", self.registers[AC]);
+        let character = (self.registers[AC] & 0x00ff) as u8 as char;
+        print!("{}", character);
     }
 
     fn run(&mut self, memory: &mut Memory) {
@@ -201,6 +202,7 @@ impl Memory {
     }
 }
 
+/*
 enum Instruction {
     JnS(i16),
     Load(i16),
@@ -218,48 +220,50 @@ enum Instruction {
     LoadI,
     StoreI,
 }
+*/
 
 fn main() {
     let mut memory = Memory::new(4096);
+
     let program = vec![
-        0x1100, // Load H (ASCII 72) into AC
-        0x6100, // Output AC
-        0x1101, // Load e (ASCII 101) into AC
-        0x6100, // Output AC
-        0x1102, // Load l (ASCII 108) into AC
-        0x6100, // Output AC
-        0x1102, // Load l (ASCII 108) into AC
-        0x6100, // Output AC
-        0x1103, // Load o (ASCII 111) into AC
-        0x6100, // Output AC
-        0x1104, // Load , (ASCII 44) into AC
-        0x6100, // Output AC
-        0x1105, // Load space (ASCII 32) into AC
-        0x6100, // Output AC
-        0x1106, // Load W (ASCII 87) into AC
-        0x6100, // Output AC
-        0x1107, // Load o (ASCII 111) into AC
-        0x6100, // Output AC
-        0x1108, // Load r (ASCII 114) into AC
-        0x6100, // Output AC
-        0x1102, // Load l (ASCII 108) into AC
-        0x6100, // Output AC
-        0x1109, // Load d (ASCII 100) into AC
-        0x6100, // Output AC
-        0x110a, // Load ! (ASCII 33) into AC
-        0x6100, // Output AC
+        0x101b, // Load H (ASCII 72) into AC
+        0x6000, // Output AC
+        0x101c, // Load e (ASCII 101) into AC
+        0x6000, // Output AC
+        0x101d, // Load l (ASCII 108) into AC
+        0x6000, // Output AC
+        0x101d, // Load l (ASCII 108) into AC
+        0x6000, // Output AC
+        0x101e, // Load o (ASCII 111) into AC
+        0x6000, // Output AC
+        0x101f, // Load , (ASCII 44) into AC
+        0x6000, // Output AC
+        0x1020, // Load space (ASCII 32) into AC
+        0x6000, // Output AC
+        0x1021, // Load W (ASCII 87) into AC
+        0x6000, // Output AC
+        0x101e, // Load o (ASCII 111) into AC
+        0x6000, // Output AC
+        0x1022, // Load r (ASCII 114) into AC
+        0x6000, // Output AC
+        0x101d, // Load l (ASCII 108) into AC
+        0x6000, // Output AC
+        0x1023, // Load d (ASCII 100) into AC
+        0x6000, // Output AC
+        0x1024, // Load ! (ASCII 33) into AC
+        0x6000, // Output AC
         0x7000, // Halt
         // Data section
-        0x0048, // H (ASCII 72)
-        0x0065, // e (ASCII 101)
-        0x006c, // l (ASCII 108)
-        0x006f, // o (ASCII 111)
-        0x002c, // , (ASCII 44)
-        0x0020, // space (ASCII 32)
-        0x0057, // W (ASCII 87)
-        0x0072, // r (ASCII 114)
-        0x0064, // d (ASCII 100)
-        0x0021 // ! (ASCII 33)
+        0x0048, // H (ASCII 72) - addr 0x001b
+        0x0065, // e (ASCII 101) - addr 0x001c
+        0x006c, // l (ASCII 108) - addr 0x001d
+        0x006f, // o (ASCII 111) - addr 0x001e
+        0x002c, // , (ASCII 44) - addr 0x001f
+        0x0020, // space (ASCII 32) - addr 0x0020
+        0x0057, // W (ASCII 87) - addr 0x0021
+        0x0072, // r (ASCII 114) - addr 0x0022
+        0x0064, // d (ASCII 100) - addr 0x0023
+        0x0021 // ! (ASCII 33) - addr 0x0024
     ];
     memory.load_program(program);
 
