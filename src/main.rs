@@ -81,7 +81,7 @@ impl CPU {
 
             //SKIPCOND
             0x8 => {
-                let cond = self.registers[IR] & (0x0c00 >> 10); //Get condition from bits 11-10 and shift to LSB for easy comparison
+                let cond = (self.registers[IR] & 0x0c00) >> 10; //Get condition from bits 11-10 and shift to LSB for easy comparison
                 match cond {
                     0b00 => {
                         if self.registers[AC] < 0 {
