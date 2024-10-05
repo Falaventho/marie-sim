@@ -215,10 +215,10 @@ enum Instruction {
     Skipcond(i16),
     Jump(i16),
     Clear,
-    AddI,
-    JumpI,
-    LoadI,
-    StoreI,
+    AddI(i16),
+    JumpI(i16),
+    LoadI(i16),
+    StoreI(i16),
 }
 */
 
