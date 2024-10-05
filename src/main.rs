@@ -1,4 +1,4 @@
-use std::io::{ self, Write };
+use std::{ fs, io::{ self, Write } };
 
 const AC: usize = 0; //Accumulator
 const PC: usize = 1; //Program Counter
@@ -222,51 +222,26 @@ enum Instruction {
 }
 */
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut memory = Memory::new(4096);
 
-    let program = vec![
-        0x101b, // Load H (ASCII 72) into AC
-        0x6000, // Output AC
-        0x101c, // Load e (ASCII 101) into AC
-        0x6000, // Output AC
-        0x101d, // Load l (ASCII 108) into AC
-        0x6000, // Output AC
-        0x101d, // Load l (ASCII 108) into AC
-        0x6000, // Output AC
-        0x101e, // Load o (ASCII 111) into AC
-        0x6000, // Output AC
-        0x101f, // Load , (ASCII 44) into AC
-        0x6000, // Output AC
-        0x1020, // Load space (ASCII 32) into AC
-        0x6000, // Output AC
-        0x1021, // Load W (ASCII 87) into AC
-        0x6000, // Output AC
-        0x101e, // Load o (ASCII 111) into AC
-        0x6000, // Output AC
-        0x1022, // Load r (ASCII 114) into AC
-        0x6000, // Output AC
-        0x101d, // Load l (ASCII 108) into AC
-        0x6000, // Output AC
-        0x1023, // Load d (ASCII 100) into AC
-        0x6000, // Output AC
-        0x1024, // Load ! (ASCII 33) into AC
-        0x6000, // Output AC
-        0x7000, // Halt
-        // Data section
-        0x0048, // H (ASCII 72) - addr 0x001b
-        0x0065, // e (ASCII 101) - addr 0x001c
-        0x006c, // l (ASCII 108) - addr 0x001d
-        0x006f, // o (ASCII 111) - addr 0x001e
-        0x002c, // , (ASCII 44) - addr 0x001f
-        0x0020, // space (ASCII 32) - addr 0x0020
-        0x0057, // W (ASCII 87) - addr 0x0021
-        0x0072, // r (ASCII 114) - addr 0x0022
-        0x0064, // d (ASCII 100) - addr 0x0023
-        0x0021 // ! (ASCII 33) - addr 0x0024
-    ];
+    let program_file = fs::read_to_string("./program.mrf")?;
+    let raw_bytes = hex::decode(program_file.trim())?;
+    let program: Vec<i16> = raw_bytes
+        .chunks(2)
+        .map(|chunk| {
+            if chunk.len() == 2 {
+                Ok((((chunk[0] as u16) << 8) | (chunk[1] as u16)) as i16)
+            } else {
+                Err("Incomplete byte pair")
+            }
+        })
+        .collect::<Result<Vec<i16>, &str>>()?;
+
     memory.load_program(program);
 
     let mut cpu = CPU::new();
     cpu.run(&mut memory);
+
+    Ok(())
 }
