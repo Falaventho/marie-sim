@@ -9,13 +9,13 @@ const MBR: usize = 4; //Memory Buffer Register
 // const OUTPUT: usize = 6; output register - implemented via std::io
 
 struct CPU {
-    registers: [i16; 7],
+    registers: [i16; 5],
 }
 
 impl CPU {
     fn new() -> CPU {
         CPU {
-            registers: [0; 7],
+            registers: [0; 5],
         }
     }
 
