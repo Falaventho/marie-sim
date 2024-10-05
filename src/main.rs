@@ -225,15 +225,17 @@ enum Instruction {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut memory = Memory::new(4096);
 
-    let program_file = fs::read_to_string("./program.mrf")?;
-    let raw_bytes = hex::decode(program_file.trim())?;
+    //Read bin
+    let raw_bytes = fs::read("./program.out")?;
+
+    //Combine u8 bytes into i16 words
     let program: Vec<i16> = raw_bytes
         .chunks(2)
         .map(|chunk| {
             if chunk.len() == 2 {
-                Ok((((chunk[0] as u16) << 8) | (chunk[1] as u16)) as i16)
+                Ok(i16::from_be_bytes([chunk[0], chunk[1]]))
             } else {
-                Err("Incomplete byte pair")
+                Err("Incomplete byte pair.")
             }
         })
         .collect::<Result<Vec<i16>, &str>>()?;
