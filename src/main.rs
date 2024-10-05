@@ -15,7 +15,7 @@ struct CPU {
 impl CPU {
     fn new() -> CPU {
         CPU {
-            registers: [0; 5],
+            registers: [0, 100, 0, 0, 0],
         }
     }
 
@@ -226,7 +226,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut memory = Memory::new(4096);
 
     //Read bin
-    let raw_bytes = fs::read("./rom/MARIE.ROM")?;
+    let raw_bytes = fs::read("./ROM/MARIE.ROM")?;
 
     //Combine u8 bytes into i16 words
     let program: Vec<i16> = raw_bytes
