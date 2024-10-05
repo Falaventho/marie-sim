@@ -20,13 +20,15 @@ impl CPU {
     }
 
     fn fetch(&mut self, memory: &Memory) {
-        self.registers[MAR] = self.registers[PC];
+        self.registers[MAR] = self.registers[PC] & 0x0fff;
         self.registers[IR] = memory.read(self.registers[MAR]);
         self.registers[PC] += 1;
     }
 
     fn decode_execute(&mut self, memory: &mut Memory) {
-        match self.registers[IR] >> 12 {
+        // debug println!("DECODING - IR: {:04x}", self.registers[IR]);
+        // debug println!("Opcode - {:04x}", (self.registers[IR] >> 12) & 0xf);
+        match (self.registers[IR] >> 12) & 0xf {
             //Get opcode from 4 high bits
 
             //JnS
@@ -164,6 +166,10 @@ impl CPU {
     }
 
     fn output(&self) {
+        print!("{}", self.registers[AC])
+    }
+
+    fn output_ascii(&self) {
         let character = (self.registers[AC] & 0x00ff) as u8 as char;
         print!("{}", character);
     }
@@ -172,6 +178,18 @@ impl CPU {
         loop {
             self.fetch(memory);
             self.decode_execute(memory);
+
+            //debug print
+            /*
+            println!(
+                "DEBUG   -   AC: {:04x}   PC: {:04x}   IR: {:04x}   MAR: {:04x}   MBR: {:04x}",
+                self.registers[AC],
+                self.registers[PC],
+                self.registers[IR],
+                self.registers[MAR],
+                self.registers[MBR]
+            );
+            */
         }
     }
 }
