@@ -169,10 +169,11 @@ impl CPU {
         print!("{}", self.registers[AC])
     }
 
-    fn output_ascii(&self) {
+    // TODO use with output formatting selection to make char output possible.
+    /*fn output_ascii(&self) {
         let character = (self.registers[AC] & 0x00ff) as u8 as char;
         print!("{}", character);
-    }
+    }*/
 
     fn run(&mut self, memory: &mut Memory) {
         loop {
