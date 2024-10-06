@@ -13,7 +13,7 @@ At runtime, the simulator looks for a file named MARIE.ROM in the ROM directory.
 1. Assemble a program using the [assembler](https://github.com/falaventho/marie-assembler). Or use a pre-assembled program (some are included with release).
 2. Rename file to 'MARIE.ROM' to ensure the simulator reads it.
 3. Place the file in the ROM directory.
-4. Run the marie-simulator.exe using a terminal
+4. Run the marie-simulator.exe using a terminal (add a ASCII command line argument to convert output into ASCII!)
 
 ### Requirements
 
