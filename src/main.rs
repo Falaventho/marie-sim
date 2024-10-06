@@ -1,4 +1,4 @@
-use std::{ fs, io::{ self, Write } };
+use std::{ env, fs, io::{ self, Write } };
 
 const AC: usize = 0; //Accumulator
 const PC: usize = 1; //Program Counter
@@ -7,6 +7,9 @@ const MAR: usize = 3; //Memory Address Register
 const MBR: usize = 4; //Memory Buffer Register
 // const INPUT: usize = 5; input register - implemented via std::io
 // const OUTPUT: usize = 6; output register - implemented via std::io
+
+const DEC: i16 = 10;
+const ASCII: i16 = 32;
 
 struct CPU {
     registers: [i16; 5],
@@ -73,7 +76,7 @@ impl CPU {
 
             //OUTPUT
             0x6 => {
-                self.output();
+                self.output(&memory);
             }
 
             //HALT
@@ -165,17 +168,22 @@ impl CPU {
         self.registers[AC] = input.trim().parse().unwrap_or(0);
     }
 
-    fn output(&self) {
-        print!("{}", self.registers[AC])
+    fn output(&self, memory: &Memory) {
+        let output_type = memory.read(0x0010 as i16);
+
+        match output_type {
+            DEC => {
+                print!("{}", self.registers[AC]);
+            }
+            ASCII => { print!("{}", (self.registers[AC] & 0x00ff) as u8 as char) }
+            _ => {
+                print!("{}", self.registers[AC]);
+            }
+        }
     }
 
-    // TODO use with output formatting selection to make char output possible.
-    /*fn output_ascii(&self) {
-        let character = (self.registers[AC] & 0x00ff) as u8 as char;
-        print!("{}", character);
-    }*/
-
-    fn run(&mut self, memory: &mut Memory) {
+    fn run(&mut self, memory: &mut Memory, output_type: i16) {
+        memory.write(0x0010 as i16, output_type);
         loop {
             self.fetch(memory);
             self.decode_execute(memory);
@@ -242,6 +250,15 @@ enum Instruction {
 */
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let args: Vec<String> = env::args().collect();
+
+    let output_arg = if args.len() > 1 { &args[1] } else { "DEAULT" };
+    let output_type = match output_arg {
+        "DEC" => { DEC }
+        "ASCII" => { ASCII }
+        _ => { DEC }
+    };
+
     let mut memory = Memory::new(4096);
 
     //Read bin
@@ -262,7 +279,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     memory.load_program(program);
 
     let mut cpu = CPU::new();
-    cpu.run(&mut memory);
+    cpu.run(&mut memory, output_type);
 
     Ok(())
 }
